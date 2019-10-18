@@ -7,11 +7,17 @@
  * property is worth and listingNumber which holds the listing number that identifies the 
  * property's MLS listing.
  * 
+ * 10.18.19
+ * Added static variable to Property class that keeps a count of properties created, incremented
+ * each time that a new Property object is created.
+ * Added an enum class to describe the sale status of the property, initialized as AVALIABLE
+ * Implemented a compareTo method for ordering of properties	  
+ * 
  * @author Alex
  *
  */
 
-public class Property {
+public class Property implements Comparable<Property> {
 	
 	private String address;
 	private int value;
@@ -20,6 +26,12 @@ public class Property {
 	public static final double AVERAGE_TAX = .04;
 	public static final double AVERAGE_MORTGAGE = .047;
 	public static final double AVERAGE_COMMISSION = .0508;
+	
+	//static variable
+	private static int totalProperties = 0;
+	
+	//Enum variable
+	private Sale saleStatus;
 	
 	/**
 	 * default constructor and three-variable constructor included, must have all three
@@ -34,6 +46,8 @@ public class Property {
 		address = a;
 		value = v;
 		listingNumber = ln;
+		Property.totalProperties++;
+		saleStatus = Sale.AVAILABLE;
 	}
 	
 	public void setAddress(String s) {
@@ -60,10 +74,21 @@ public class Property {
 		return listingNumber;
 	}
 	
+	//Enum setter
+	public void setSaleStatus(Sale s) {
+		saleStatus = s;
+	}
+	
+	//Enum getter
+	public Sale getSaleStatus() {
+		return saleStatus;
+	}
+	
 	public String toString() {
 		return "The property is located at: " + address +"\r\n"
 				+ "The value of the property is: $" + value + "\r\n"
 				+ "The listing number is: " + listingNumber + "\r\n"
+				+ "Sale Status: " + saleStatus.getSaleCode();
 	}
 	
 	@Override
@@ -107,4 +132,29 @@ public class Property {
 		return (value * Property.AVERAGE_COMMISSION);
 	}
 	
+	//static method for getting total number of Properties
+	public static int getTotalProperties() {
+		return Property.totalProperties;
+	}
 	
+	//static method for removing a Property from the total count
+	public static void removeProperty() {
+		Property.totalProperties--;
+	}
+	
+	//compareTo method
+	public int compareTo(Property p) {
+		if(this.value > p.value) { //the property is greater than because it is worth more
+			return 1;
+		} else if(this.value < p.value) { //the property is less than because it is worth less
+			return -1;
+		} else { //the values are equal - check the listing number
+			if(this.listingNumber > p.listingNumber)
+				return 1; //the property is greater than because it is a newer listing
+			else if(this.listingNumber < p.listingNumber)
+				return -1; //the property is less than because it is an older listing
+			else
+				return 0; //the property is the same because it has the same listing number
+		}
+	}
+}
